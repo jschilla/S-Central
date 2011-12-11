@@ -401,6 +401,11 @@ public class YahooStockDataGrabber implements StockDataGrabber, StockCentralCons
 
 	// static methods
 
+	private static final String GOOGLE_STOCK_STRING =
+		"http://www.google.com/finance/historical?histperiod=weekly&output=csv";
+
+		//
+
 	/**
 	 * This method creates the stock data URL for a given stock and date range and then returns it.
 	 *

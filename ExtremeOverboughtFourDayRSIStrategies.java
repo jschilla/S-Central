@@ -90,7 +90,7 @@ public class ExtremeOverboughtFourDayRSIStrategies extends BacktestStrategies {
 
 	}	// waitsForExit
 
-	public boolean testExitAtDay (StockData sd, int strategyId, int lookback) {
+	public boolean testExitAtDay (StockData sd, int strategyId, int lookback, float closeAtMatch) {
 
 		boolean toReturn = false;
 

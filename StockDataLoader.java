@@ -71,7 +71,7 @@ public class StockDataLoader {
 				StockData sd = sdg.pullStockPriceHistoricalData(ticker);
 
 					// we only care about stocks that have a volume of at least 25000.
-				if (sd.getVolumes()[0] >= 1000) {
+				if (sd.getVolumes()[0] >= 10000) {
 
 					// sd.calculateBellsAndWhistles();
 
@@ -142,17 +142,27 @@ class StockDataLoaderThread extends Thread {
 
 		try {
 
-			System.out.println("Loading data for stock:  " + m_ticker);
+			System.out.print("Loading data for stock:  " + m_ticker);
 
 			StockData sd = m_sdg.pullStockPriceHistoricalData(m_ticker);
 
 			// sd.calculateBellsAndWhistles();
 
-			String sdFileName = generateDataFileName(m_ticker);
+			long lastVolume = sd.getVolumes()[0];
 
-			StockCentral.serializeObject(sdFileName, StockDataLoader.DATA_DIRECTORY, sd);
+			if (lastVolume > 10000) {
 
-			m_dataArray.add(sdFileName);
+				String sdFileName = generateDataFileName(m_ticker);
+
+				StockCentral.serializeObject(sdFileName, StockDataLoader.DATA_DIRECTORY, sd);
+
+				m_dataArray.add(sdFileName);
+
+				System.out.println();
+
+			}
+			else
+				System.out.println(" -- Volume too low!");
 
 		}	// try
 		catch (FileNotFoundException e) {

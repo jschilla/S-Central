@@ -15,7 +15,7 @@ public abstract class BacktestStrategies {
 
 	public abstract boolean testStrategyAtDay (StockData sd, int strategyId, int lookBack);
 
-	public abstract boolean testExitAtDay (StockData sd, int strategyId, int lookBack);
+	public abstract boolean testExitAtDay (StockData sd, int strategyId, int lookBack, float closeAtMatch);
 
 		// This method doesn't check for a completed signal, but instead checks for the day before
 		// a completed signal.  This is being added so that we can detect possible setups before

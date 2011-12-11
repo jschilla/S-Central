@@ -31,53 +31,61 @@ public class MacD {
 
 	private void calculateMacD(int smallEMAPeriod, int largeEMAPeriod, int signalPeriod, float[] closes) {
 
-		double[] smallEMA, largeEMA;
+		if (closes.length > largeEMAPeriod) {
 
-		smallEMA = StockCentral.calculateEMA(closes, smallEMAPeriod);
-		largeEMA = StockCentral.calculateEMA(closes, largeEMAPeriod);
+			double[] smallEMA, largeEMA;
 
-			// Now, let's calculate the difference between the small EMA and the big one.  That's our MacD
+			smallEMA = StockCentral.calculateEMA(closes, smallEMAPeriod);
+			largeEMA = StockCentral.calculateEMA(closes, largeEMAPeriod);
 
-		double[] macdWithoutZeros = new double[closes.length - (largeEMAPeriod - 1)];
-		double[] zeros = new double[largeEMAPeriod - 1];
+				// Now, let's calculate the difference between the small EMA and the big one.  That's our MacD
 
-			// Fill up the zeros array with zeros!
-		Arrays.fill(zeros, 0);
+			double[] macdWithoutZeros = new double[closes.length - (largeEMAPeriod - 1)];
+			double[] zeros = new double[largeEMAPeriod - 1];
 
-			// Now we calculate the MacD in a separate array without the zeros, which we will then merge.
-        for (int countMACDs = macdWithoutZeros.length - 1; countMACDs >= 0; countMACDs--)
-            macdWithoutZeros[countMACDs] = smallEMA[countMACDs] - largeEMA[countMACDs];
+				// Fill up the zeros array with zeros!
+			Arrays.fill(zeros, 0);
 
-//		for (int countMACDs = 0; countMACDs < macdWithoutZeros.length; countMACDs++)
-//			macdWithoutZeros[countMACDs] = smallEMA[countMACDs + largeEMAPeriod] - largeEMA[countMACDs + largeEMAPeriod];
+				// Now we calculate the MacD in a separate array without the zeros, which we will then merge.
+	        for (int countMACDs = macdWithoutZeros.length - 1; countMACDs >= 0; countMACDs--)
+	            macdWithoutZeros[countMACDs] = smallEMA[countMACDs] - largeEMA[countMACDs];
 
-		m_macd = StockCentral.mergeDoubleArrays(macdWithoutZeros, zeros);
+//			for (int countMACDs = 0; countMACDs < macdWithoutZeros.length; countMACDs++)
+//				macdWithoutZeros[countMACDs] = smallEMA[countMACDs + largeEMAPeriod] - largeEMA[countMACDs + largeEMAPeriod];
 
-			// Next, we'll calculate an EMA of the MacD.  We're going to calculate the EMA of the macdWithoutZeros array,
-			// and then we're going to merge that with the zeros array already created, and that's our signal line!
-		double[] signalWithoutZeros = StockCentral.calculateEMA(m_macd, signalPeriod);
+			m_macd = StockCentral.mergeDoubleArrays(macdWithoutZeros, zeros);
 
-		m_signal = StockCentral.mergeDoubleArrays(signalWithoutZeros, zeros);
+				// Next, we'll calculate an EMA of the MacD.  We're going to calculate the EMA of the macdWithoutZeros array,
+				// and then we're going to merge that with the zeros array already created, and that's our signal line!
+			double[] signalWithoutZeros = StockCentral.calculateEMA(m_macd, signalPeriod);
 
-			// Next, let's calculate the histogram.
-		m_histogram = new double[closes.length];
+			m_signal = StockCentral.mergeDoubleArrays(signalWithoutZeros, zeros);
 
-		for (int countHistograms = 0; countHistograms < closes.length; countHistograms++)
-			m_histogram[countHistograms] = m_macd[countHistograms] - m_signal[countHistograms];
+				// Next, let's calculate the histogram.
+			m_histogram = new double[closes.length];
 
-			// Finally, let's calculate the average of the absolute values of the histograms.
-		double totalOfHistograms = 0;
-		for (int countTotals = 0; countTotals < closes.length; countTotals++)
-			totalOfHistograms += Math.abs(m_histogram[countTotals]);
+			for (int countHistograms = 0; countHistograms < closes.length; countHistograms++)
+				m_histogram[countHistograms] = m_macd[countHistograms] - m_signal[countHistograms];
 
-		m_averageHistogram = totalOfHistograms / (closes.length - largeEMAPeriod);
+				// Finally, let's calculate the average of the absolute values of the histograms.
+			double totalOfHistograms = 0;
+			for (int countTotals = 0; countTotals < closes.length; countTotals++)
+				totalOfHistograms += Math.abs(m_histogram[countTotals]);
 
-        /*    // FOR DEBUGGING PURPOSES ONLY -- NOW REMOVED!
-        System.out.println("Finished " + smallEMAPeriod + "," + largeEMAPeriod + "," + signalPeriod + " MacD calculation!");
-        System.out.println("MacD today:  " + m_macd[0]);
-        System.out.println("Signal today:  " + m_signal[0]);
-        System.out.println("Histogram today:  " + m_histogram[0]);
-        */
+			m_averageHistogram = totalOfHistograms / (closes.length - largeEMAPeriod);
+
+	        /*    // FOR DEBUGGING PURPOSES ONLY -- NOW REMOVED!
+	        System.out.println("Finished " + smallEMAPeriod + "," + largeEMAPeriod + "," + signalPeriod + " MacD calculation!");
+	        System.out.println("MacD today:  " + m_macd[0]);
+	        System.out.println("Signal today:  " + m_signal[0]);
+	        System.out.println("Histogram today:  " + m_histogram[0]);
+	        */
+		}	// if
+		else {
+
+			throw new ArrayIndexOutOfBoundsException();
+
+		}
 
 	}	// calculateMacD
 

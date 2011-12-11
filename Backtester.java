@@ -86,28 +86,39 @@ public class Backtester {
 		for (int countStockData = 0; (countStockData < dataArray.size() /*&& countStockData < 10 */);
 			countStockData++) {
 
-			StockData sd = dataArray.getNextData();
+			try {
 
-			sd.calculateBellsAndWhistles();
+				StockData sd = dataArray.getNextData();
 
-			sd.spitOutData();
+				System.out.print(sd.getTicker());
 
-			System.out.println(sd.getTicker());
+				sd.calculateBellsAndWhistles();
 
-			//float closes[] = sd.getCloses();
+				sd.spitOutData();
 
-			Vector matches = new Vector();
+				//float closes[] = sd.getCloses();
 
-				// This pulls all the results for this stock for all strategies.
-			BacktestLog[][] stockLogs = backtestForOneStock(sd, indexData, activeStrategies, matches);
+				Vector matches = new Vector();
 
-				// And then we add it to the hashtable.
-			//stockMatrixLogs.put(sd.getTicker(), stockLogs);
+					// This pulls all the results for this stock for all strategies.
+				BacktestLog[][] stockLogs = backtestForOneStock(sd, indexData, activeStrategies, matches);
 
-				// Spit out this line of data.
-			outputMatrixDataLine(matrixOut, stockLogs, sd.getTicker());
+					// And then we add it to the hashtable.
+				//stockMatrixLogs.put(sd.getTicker(), stockLogs);
 
-			outputTradeReportEntries(matches, tradeReportOut);
+					// Spit out this line of data.
+				outputMatrixDataLine(matrixOut, stockLogs, sd.getTicker());
+
+				outputTradeReportEntries(matches, tradeReportOut);
+
+				System.out.println(" --- Complete!");
+			}	// try
+			catch (ArrayIndexOutOfBoundsException e) {
+
+				System.out.println(" -- Skipped for lack of data!");
+
+			}
+
 
 		}	// cycle each stock
 
@@ -126,7 +137,7 @@ public class Backtester {
 
 	}	// main()
 
-	private static final BacktestLog[][] backtestForOneStock(StockData sd, StockData indexData,
+	public static final BacktestLog[][] backtestForOneStock(StockData sd, StockData indexData,
 			BacktestStrategies[] activeStrategies, Vector everyMatch) {
 
 		BacktestLog[][] logs = createStockLogArray(activeStrategies, false);
@@ -175,6 +186,7 @@ public class Backtester {
 		BacktestLog log = new BacktestLog(strategies, strategyId);
 
 		float[] closes = sd.getCloses();
+		float closeAtMatch = 0.0f;
 
 			// we need to set the backtest log so that it knows how many days there are.  this will become
 			// necessary when we do averaging later.
@@ -204,8 +216,13 @@ public class Backtester {
 
 				everyMatch.add(entry);
 
-				if (strategies.waitsForExit(strategyId))
+				if (strategies.waitsForExit(strategyId)) {
+
 					positionOpen = true;
+
+					closeAtMatch = closes[dayCount];
+
+				}
 
 			}	// if we have a match.
 
@@ -213,7 +230,7 @@ public class Backtester {
 				// to see if the position now needs to be closed.
 			else if (positionOpen) {
 
-				if (strategies.testExitAtDay(sd, strategyId, dayCount))
+				if (strategies.testExitAtDay(sd, strategyId, dayCount, closeAtMatch))
 					positionOpen = false;
 
 			}

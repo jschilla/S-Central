@@ -737,14 +737,14 @@ public class StockData implements Monitorable, StockCentralConstants,
 
 		m_200DayEMA = StockCentral.calculateEMA(m_closes, 200);
 
-		m_200DaySMA = StockCentral.calculateSMA(m_closes, 200);
+//		m_200DaySMA = StockCentral.calculateSMA(m_closes, 200);
 
-		m_5DaySMA = StockCentral.calculateSMA(m_closes, 5);
+//		m_5DaySMA = StockCentral.calculateSMA(m_closes, 5);
 
 		    // FOR DEBUGGING PURPOSES I AM COMMENTING THESE OUT!!!
         m_macd_9_26_9 = new MacD(9, 26, 9, m_closes);
-		//m_macd_5_35_5 = new MacD(5, 35, 5, m_closes);
-		//m_macd_4_26_9 = new MacD(4, 26, 9, m_closes);
+		m_macd_5_35_5 = new MacD(5, 35, 5, m_closes);
+		m_macd_4_26_9 = new MacD(4, 26, 9, m_closes);
 		m_macd_4_9_4 = new MacD(4, 9, 4, m_closes);
 
 		/*
@@ -957,12 +957,13 @@ public class StockData implements Monitorable, StockCentralConstants,
 	public void spitOutData() {
 
 		StockCentral.dataMonitorOutput("Data for stock " + m_ticker);
-		StockCentral.dataMonitorOutput("   Date   -   Close");
+		StockCentral.dataMonitorOutput("   Date   -   Close   -    Large MacD - Large Signal - Avg Histogram");
 
 		for (int count = 0; count < m_closes.length; count++) {
 
 			StockCentral.dataMonitorOutput(StockCentral.generateDateString(	m_dates[count]) +
-					" - " + m_closes[count]);
+					" - " + m_closes[count] + " - " + m_macd_9_26_9.getMacD()[count] + " - " +
+					m_macd_9_26_9.getSignal()[count] + " - " + m_macd_9_26_9.getAverageHistogram());
 
 		}	// cycle through each date
 

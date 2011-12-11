@@ -94,6 +94,8 @@ public class BacktestLogEntry implements BacktestLogStorable {
 		float[] mktCloses = index.getCloses();
 		float[] mktOpens = index.getOpens();
 
+		float closeAtMatch = closes[lookback];
+
 			// First, we need to set everything to zero.  If there's an ArrayIndexOutOfBoundsError,
 			// we want to make sure there's a zero set.
 		for (int count = 0; count < LOG_DATA_NAMES.length; count++) {
@@ -121,7 +123,7 @@ public class BacktestLogEntry implements BacktestLogStorable {
 			for (countForwardToExit = 1; (!exitedPosition) && ((lookback - countForwardToExit) >= 0);
 				countForwardToExit++) {
 
-				if (strategies.testExitAtDay(sd, strategyId, lookback - countForwardToExit))
+				if (strategies.testExitAtDay(sd, strategyId, lookback - countForwardToExit, closeAtMatch))
 					exitedPosition = true;
 
 			}	// while the position has not been exited.

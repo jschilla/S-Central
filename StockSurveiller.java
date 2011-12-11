@@ -60,13 +60,26 @@ public class StockSurveiller {
 			// output the results of that.
 		for (int countStocks = 0; countStocks < dataArray.size(); countStocks++) {
 
-			StockData sd = dataArray.getNextData();
-			sd.calculateBellsAndWhistles();
-			sd.spitOutData();
+			try {
 
-			System.out.println(sd.getTicker());
+				StockData sd = dataArray.getNextData();
+				System.out.print(sd.getTicker());
 
-			surveillanceForOneStock(sd, activeStrategies, surveillanceOut, indexData);
+				sd.calculateBellsAndWhistles();
+				sd.spitOutData();
+
+
+				surveillanceForOneStock(sd, activeStrategies, surveillanceOut, indexData);
+
+				System.out.println(" -- Complete!!!");
+			}	// try
+		catch (ArrayIndexOutOfBoundsException e) {
+
+				System.out.println(" -- Skipped for lack of data!");
+
+				e.printStackTrace(StockCentral.getDebugOutput());
+
+			}
 
 /*
 				// go through each strategy object.
@@ -78,7 +91,7 @@ public class StockSurveiller {
 					countStrategies < activeStrategies[countStrategyObjects].getNumberOfStrategies();
 					countStrategies++) {
 
-							// if we have a set up for this particular strategy for this stock, then
+							// if we have a set up for this particular strategwwy for this stock, then
 							// we conduct a backtest and then we output all the information into the
 							// file.
 						if (activeStrategies[countStrategyObjects].testStrategyAtDay(sd,

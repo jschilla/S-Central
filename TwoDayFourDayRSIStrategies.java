@@ -134,16 +134,17 @@ public class TwoDayFourDayRSIStrategies extends BacktestStrategies {
 		float[] m_closes = sd.getCloses();
 
 
-		int numCombosEachSide = TWO_DAY_ENTRY.length * FOUR_DAY_ENTRY.length * TWO_DAY_EXIT.length * FOUR_DAY_EXIT.length;
+		int numCombosEachSide = TWO_DAY_ENTRY.length * FOUR_DAY_ENTRY.length *
+			TWO_DAY_EXIT.length * FOUR_DAY_EXIT.length;
 
 		int twoDayEntry, fourDayEntry;
 
 		if (strategyId < numCombosEachSide) {
 
 			if ((twoDayRSI[lookBack] > bearishArray[strategyId][0]) &&
-					(fourDayRSI[lookBack] > bearishArray[strategyId][1]) &&
-					(m_closes[lookBack] < m_200DaySMA[lookBack]))
-				toReturn = true;
+				(fourDayRSI[lookBack] > bearishArray[strategyId][1]) &&
+				(m_closes[lookBack] < m_200DaySMA[lookBack]))
+					toReturn = true;
 
 		}	// if
 		else {
@@ -151,7 +152,7 @@ public class TwoDayFourDayRSIStrategies extends BacktestStrategies {
 			if ((twoDayRSI[lookBack] < bullishArray[strategyId - numCombosEachSide][0]) &&
 				(fourDayRSI[lookBack] < bullishArray[strategyId - numCombosEachSide][1]) &&
 				(m_closes[lookBack] > m_200DaySMA[lookBack]))
-				toReturn = true;
+					toReturn = true;
 
 		}	// else
 
@@ -169,7 +170,7 @@ public class TwoDayFourDayRSIStrategies extends BacktestStrategies {
 
 	}	// waitsForExit
 
-	public boolean testExitAtDay (StockData sd, int strategyId, int lookBack) {
+	public boolean testExitAtDay (StockData sd, int strategyId, int lookBack, float closeAtMatch) {
 
 		boolean toReturn = false;
 

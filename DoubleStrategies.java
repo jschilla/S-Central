@@ -80,7 +80,7 @@ public class DoubleStrategies extends BacktestStrategies {
 
 	}	// testStrategyAtDay
 
-	public boolean testExitAtDay (StockData sd, int strategyId, int lookback) {
+	public boolean testExitAtDay (StockData sd, int strategyId, int lookback, float closeAtMatch) {
 
 		boolean toReturn = true;
 
