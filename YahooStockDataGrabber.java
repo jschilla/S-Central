@@ -25,7 +25,7 @@ public class YahooStockDataGrabber implements StockDataGrabber, StockCentralCons
 
     private static final String YAHOO_CURRENT_PRICE_URL =
     	"http://finance.yahoo.com/d/quotes.csv?f=sl1d1t1c1ohgv&e=.csv&s=";
-    private static final String STOCK_DATA_OPEN = "http://ichart.finance.yahoo.com/table.csv?g=d&";
+    private static final String STOCK_DATA_OPEN = "http://ichart.finance.yahoo.com/table.csv?g=w&";
     private static final int YEAR_OFFSET = 10;
     private static final int MONTH_OFFSET = 0;
     private static final int DATE_OFFSET = 0;

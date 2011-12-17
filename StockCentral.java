@@ -1223,4 +1223,15 @@ public class StockCentral implements StockCentralConstants {
 
 	}	// calculateEMA
 
+	public static final long calculateAverage(long[] data) {
+
+		long toReturn = 0;
+
+		for (int count = 0; count < data.length; count++)
+			toReturn += (data[count] / data.length);
+
+		return toReturn;
+
+	}
+
 }

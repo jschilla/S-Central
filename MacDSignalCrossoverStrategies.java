@@ -82,13 +82,13 @@ public class MacDSignalCrossoverStrategies extends BacktestStrategies {
 				// +1 OR -1 AS A COMPARATOR.
 			if (strategyId <= 1) {
 
-				if (macd[lookback] < macd[lookback + 1])
+				if ((macd[lookback] < macd[lookback + 1]) || (histogram[lookback] < 0))
 					toReturn = true;
 
 			}
 			else if (strategyId >= 2) {
 
-				if (macd[lookback] > macd[lookback + 1])
+				if ((macd[lookback] > macd[lookback + 1]) || (histogram[lookback] > 0))
 					toReturn = true;
 
 			}

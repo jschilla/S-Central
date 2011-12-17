@@ -32,6 +32,7 @@ public class StockData implements Monitorable, StockCentralConstants,
 	private Calendar[] m_dates;
 
 	private float m_avgVolatility;
+	private long m_averageVolume;
 
 	// private CandlestickPattern m_lastPattern = CandlestickPattern.NADA;
 
@@ -112,6 +113,10 @@ public class StockData implements Monitorable, StockCentralConstants,
 
 	public long[] getVolumes() {
 		return m_volumes;
+	}
+
+	public long getAverageVolume() {
+		return m_averageVolume;
 	}
 
 	public Calendar[] getDates() {
@@ -746,6 +751,8 @@ public class StockData implements Monitorable, StockCentralConstants,
 		m_macd_5_35_5 = new MacD(5, 35, 5, m_closes);
 		m_macd_4_26_9 = new MacD(4, 26, 9, m_closes);
 		m_macd_4_9_4 = new MacD(4, 9, 4, m_closes);
+
+		m_averageVolume = StockCentral.calculateAverage(m_volumes);
 
 		/*
 		 * m_rsi = StockCentral.calculateRSI(m_closes);

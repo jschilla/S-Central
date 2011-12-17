@@ -11,9 +11,11 @@ public class ActiveBacktestStrategies {
 
 	private static final BacktestStrategies[] ACTIVES = {
 
-		new BigMoversStrategies(),
+		new MacDStrategyTesterizer()
 
-		new MacDSignalCrossoverStrategies()
+//		new BigMoversStrategies(),
+
+//		new MacDSignalCrossoverStrategies()
 		//new SmallRSIExtremesStrategies()
 
 		//new TwoDayFourDayRSIStrategies()
