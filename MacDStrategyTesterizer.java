@@ -21,6 +21,12 @@ public class MacDStrategyTesterizer extends BacktestStrategies {
 		"Cross-over without dramatic price movement"
 	};
 
+	public String getStrategyName (int strategyId) {
+
+		return STRATEGY_NAMES[strategyId];
+
+	}	// getStrategyName
+
 	/* (non-Javadoc)
 	 * @see stockcentral.BacktestStrategies#getNumberOfStrategies()
 	 */
@@ -49,12 +55,17 @@ public class MacDStrategyTesterizer extends BacktestStrategies {
 
 		boolean toReturn = false;
 
-        MacD macdData = sd.getMacD9269();
+        MacD macdData = sd.getMacD494();
 
 		float[] closes = sd.getCloses();
 		double[] macd = macdData.getMacD();
+		double[] histogram = macdData.getHistogram();
 
-		if (macd[lookback] < macd[lookback + 1])
+		if (strategyId == 4) {
+			if ((histogram[lookback] > 0) && (histogram[lookback + 1] < 0))
+				toReturn = true;
+		}
+		else if (macd[lookback] < macd[lookback + 1])
 			toReturn = true;
 
 		return toReturn;
@@ -68,48 +79,53 @@ public class MacDStrategyTesterizer extends BacktestStrategies {
 		// TODO Auto-generated method stub
 		boolean toReturn = false;
 
-        MacD macdData = sd.getMacD9269();
+        MacD macdData = sd.getMacD494();
 
 		float[] closes = sd.getCloses();
 		double[] macd = macdData.getMacD();
 		double[] signal = macdData.getSignal();
 		double[] histogram = macdData.getHistogram();
 
-		boolean crossover = ((histogram[lookback] > 0) && (histogram[lookback + 1] < 0));
+		try {
 
-			// If there's been a crossover, then we need to see if the other conditions are met.
-		if (crossover) {
+			boolean crossover = ((histogram[lookback] > 0) && (histogram[lookback + 1] < 0));
 
-			boolean highVolume = (sd.getVolumes()[lookback] > (sd.getAverageVolume() * 2));
+				// If there's been a crossover, then we need to see if the other conditions are met.
+			if (crossover) {
 
-				// The first strategy is just a generic cross-over.
-			if (strategyId == 0)
-				toReturn = true;
+				boolean highVolume = (sd.getVolumes()[lookback] > (sd.getAverageVolume() * 2));
 
-				// The second strategy will be satisfied if the cross over occurs on high volume
-				// i.e., the move was on average volume x 2
-			else if ((strategyId == 1) && (highVolume))
-				toReturn = true;
+					// The first strategy is just a generic cross-over.
+				if (strategyId == 0)
+					toReturn = true;
 
-				// The third and fourth strategies are satisfied if the cross-over occurs when the
-				// MacD is positive and negative, respectively.
-			else if ((strategyId == 2) && (macd[lookback] > 0))
-				toReturn = true;
-			else if ((strategyId == 3) && (macd[lookback] < 0))
-				toReturn = true;
+					// The second strategy will be satisfied if the cross over occurs on high volume
+					// i.e., the move was on average volume x 2
+				else if ((strategyId == 1) && (highVolume))
+					toReturn = true;
 
+					// The third and fourth strategies are satisfied if the cross-over occurs when the
+					// MacD is positive and negative, respectively.
+				else if ((strategyId == 2) && (macd[lookback] > 0))
+					toReturn = true;
+				else if ((strategyId == 3) && (macd[lookback] < 0))
+					toReturn = true;
+
+			}
+				// The fifth strategy is satisfied is there was a bullish reversal in the MacD for two days.
+			else if (strategyId == 4) {
+
+				boolean macdBullish = (macd[lookback] > macd[lookback + 1]);
+				boolean macdBullishPlusOne = (macd[lookback + 1] > macd[lookback + 2]);
+				boolean macdReversalPlusTwo = (macd[lookback + 2] < macd[lookback + 3]);
+
+				if ((macdBullish) && (macdBullishPlusOne) && (macdReversalPlusTwo))
+					toReturn = true;
+
+			}
 		}
-			// The fifth strategy is satisfied is there was a bullish reversal in the MacD for two days.
-		else if (strategyId == 4) {
+		catch (ArrayIndexOutOfBoundsException e) {}
 
-			boolean macdBullish = (macd[lookback] > macd[lookback + 1]);
-			boolean macdBullishPlusOne = (macd[lookback + 1] > macd[lookback + 2]);
-			boolean macdReversalPlusTwo = (macd[lookback + 2] < macd[lookback + 3]);
-
-			if ((macdBullish) && (macdBullishPlusOne) && (macdReversalPlusTwo))
-				toReturn = true;
-
-		}
 
 		return toReturn;
 	}
