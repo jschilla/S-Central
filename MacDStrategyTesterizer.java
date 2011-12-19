@@ -62,8 +62,9 @@ public class MacDStrategyTesterizer extends BacktestStrategies {
 		double[] histogram = macdData.getHistogram();
 
 		if (strategyId == 4) {
-			if ((histogram[lookback] > 0) && (histogram[lookback + 1] < 0))
-				toReturn = true;
+			if (((histogram[lookback] > 0) && (histogram[lookback + 1] < 0)) ||
+				(macd[lookback] < macd[lookback + 1]))
+					toReturn = true;
 		}
 		else if (macd[lookback] < macd[lookback + 1])
 			toReturn = true;
