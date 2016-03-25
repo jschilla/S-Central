@@ -82,6 +82,10 @@ public class StockDataLoader {
 					dataArray.add(sdFileName);
 
 					numStocksInArray++;
+					
+					sd.calculateBellsAndWhistles();
+					
+//					sd.printOutRSI();
 
 				}	// if
 				else

@@ -43,7 +43,7 @@ public class StockData implements Monitorable, StockCentralConstants,
 
 	private String m_ticker;
 
-	private float[] m_twoDayRSI, m_fourDayRSI;
+	private float[] m_twoDayRSI, m_fourDayRSI, m_10DayRSI, m_14DayRSI;
 
 	private float[] m_200DaySMA, m_5DaySMA;
 	private double[] m_200DayEMA;
@@ -58,6 +58,8 @@ public class StockData implements Monitorable, StockCentralConstants,
 	public MacD getMacD5355() { return m_macd_5_35_5; }
 	public MacD getMacD4269() { return m_macd_4_26_9; }
 	public MacD getMacD494() { return m_macd_4_9_4; }
+	
+	public float[] get10DayRSI() { return m_10DayRSI; }
 
 	public void setOpens(float[] s) {
 		m_opens = s;
@@ -144,11 +146,15 @@ public class StockData implements Monitorable, StockCentralConstants,
 	public float[] getFourDayRSI() {
 		return m_fourDayRSI;
 	}
+	
+	public float[] get14DayRSI() {
+		return m_14DayRSI;
+	}
 
 	public double[] get200DayEMA() {
 		return m_200DayEMA;
 	}
-
+	
 	public float[] get200DaySMA() { return m_200DaySMA; }
 
 	public float[] get5DaySMA() { return m_5DaySMA; }
@@ -726,6 +732,87 @@ public class StockData implements Monitorable, StockCentralConstants,
 		return YAHOO_CHARTS_URL + ticker;
 
 	} // generateYahooChartUrl
+	
+	private static final String MACD_9_26_9_PREFIX = "MacD-9-26-9_";
+	private static final String MACD_4_9_4_PREFIX = "MacD-4-9-4_";
+	private static final String MACD_5_35_5_PREFIX = "MacD-5-35-5_";
+	private static final String MACD_4_26_9_PREFIX = "MacD-4-26-9_";
+	private static final String MACD_DATA_DUMP_FOLDER = "macd";
+	private static final String MACD_RSI_REVERSAL_SUFFIX = "RSI-Reversal";
+	private static final String MACD_REVERSE_CROSS_SUFFIX = "MacD-Reverse-Cross";
+	private static final String MACD_REVERSE_SUFFIX = "MacD-Reversal";
+	private static final String MACD_PRICE_REVERSAL_SUFFIX = "Price-Reversal";
+	
+	private void calculateMacDData(MacD macd, String filePrefix) {
+		
+		ArrayList<MacDSignalData> macdData = new ArrayList<MacDSignalData>();
+		
+		double[] histogram = macd.getHistogram();
+		
+		for (int count = 0; count < m_closes.length - 1; count++) {
+			
+			if ((histogram[count] > 0) && (histogram[count + 1] < 0)) {
+				
+				MacDSignalData mdsd = new MacDSignalData();
+				mdsd.assessBullishCrossover(this, count, macd);
+				
+				macdData.add(mdsd);
+				
+			}
+				
+		}
+		
+		Iterator<MacDSignalData> elements = macdData.iterator();
+		
+		try { 
+			
+			PrintWriter masterOut = StockCentral.createOutputFile(m_ticker + "_" + filePrefix + System.currentTimeMillis() 
+					+ ".csv", MACD_DATA_DUMP_FOLDER);
+			masterOut.println(MacDSignalData.getHeader2ForCSV());
+			
+			
+/*			PrintWriter rsiOut = new PrintWriter(m_ticker + "_" + MACD_9_26_9_PREFIX + MACD_RSI_REVERSAL_SUFFIX + 
+					System.currentTimeMillis() + ".csv");
+			PrintWriter macdCrossOut = new PrintWriter(m_ticker + "_" + MACD_9_26_9_PREFIX + MACD_REVERSE_CROSS_SUFFIX + 
+					System.currentTimeMillis() + ".csv");
+			PrintWriter macdReverseOut = new PrintWriter(m_ticker + "_" + MACD_9_26_9_PREFIX + MACD_REVERSE_SUFFIX + 
+					System.currentTimeMillis() + ".csv");
+			PrintWriter priceOut = new PrintWriter(m_ticker + "_" + MACD_9_26_9_PREFIX + MACD_PRICE_REVERSAL_SUFFIX + 
+					System.currentTimeMillis() + ".csv");
+			
+			rsiOut.println(MacDSignalData.getHeaderForCSV());
+			macdCrossOut.println(MacDSignalData.getHeaderForCSV());
+			macdReverseOut.println(MacDSignalData.getHeaderForCSV());
+			priceOut.println(MacDSignalData.getHeaderForCSV());
+*/			
+			while (elements.hasNext()) {
+				
+				MacDSignalData data = elements.next();
+				
+				masterOut.println(data.outputAllDataInCSV());
+				
+/*				rsiOut.println(data.outputDataInCSV(data.RSI_REVERSAL_INDEX));
+				macdCrossOut.println(data.outputDataInCSV(data.MACD_REVERSE_CROSSOVER_INDEX));
+				macdReverseOut.println(data.outputDataInCSV(data.MACD_REVERSE_INDEX));
+				priceOut.println(data.outputDataInCSV(data.CLOSE_INDEX));
+*/				
+			}
+	
+			masterOut.close();
+			
+/*			rsiOut.close();
+			macdCrossOut.close();
+			macdReverseOut.close();
+			priceOut.close();
+*/			
+		}	// try
+		catch (Exception e) {
+			
+			e.printStackTrace();
+
+		}
+
+	}
 
 	/**
 	 * This method calculates (or has other classes calculate) all of the
@@ -739,6 +826,10 @@ public class StockData implements Monitorable, StockCentralConstants,
 		m_twoDayRSI = StockCentral.calculateRSI(m_closes, 2);
 
 		m_fourDayRSI = StockCentral.calculateRSI(m_closes, 4);
+		
+		m_10DayRSI = StockCentral.calculateRSI(m_closes, 10);
+		
+		m_14DayRSI = StockCentral.calculateRSI(m_closes, 14);
 
 		m_200DayEMA = StockCentral.calculateEMA(m_closes, 200);
 
@@ -746,12 +837,28 @@ public class StockData implements Monitorable, StockCentralConstants,
 
 //		m_5DaySMA = StockCentral.calculateSMA(m_closes, 5);
 
-		    // FOR DEBUGGING PURPOSES I AM COMMENTING THESE OUT!!!
-        m_macd_9_26_9 = new MacD(9, 26, 9, m_closes);
+/*        m_macd_9_26_9 = new MacD(9, 26, 9, m_closes);
 		m_macd_5_35_5 = new MacD(5, 35, 5, m_closes);
 		m_macd_4_26_9 = new MacD(4, 26, 9, m_closes);
 		m_macd_4_9_4 = new MacD(4, 9, 4, m_closes);
-
+		
+		calculateMacDData(m_macd_9_26_9, MACD_9_26_9_PREFIX);
+		calculateMacDData(m_macd_5_35_5, MACD_5_35_5_PREFIX);
+		calculateMacDData(m_macd_4_26_9, MACD_4_26_9_PREFIX);
+		calculateMacDData(m_macd_4_9_4, MACD_4_9_4_PREFIX);
+*/		
+		
+/*		PrintWriter dataOut = StockCentral.getDebugOutput();
+		double[] macd = m_macd_4_9_4.getMacD();
+		double[] signal = m_macd_4_9_4.getSignal();
+		double[] histogram = m_macd_4_9_4.getHistogram();
+		
+		dataOut.println("Date -------- 494 MacD ---------- Signal ----------- Histogram");
+		
+		for (int count = 0; count < m_dates.length; count++)
+			dataOut.println(m_dates[count].getTime().toString() + " - " + macd[count] + " - " + signal[count] 
+					+ " - " + histogram[count]);
+*/
 		m_averageVolume = StockCentral.calculateAverage(m_volumes);
 
 		/*
@@ -781,6 +888,22 @@ public class StockData implements Monitorable, StockCentralConstants,
 		 */
 
 	} // calculateBellsAndWhistles
+	
+	public void printOutRSI() {
+		
+		String fileName = "rsiReport" + System.currentTimeMillis() + ".csv";
+		
+		PrintWriter out = StockCentral.createOutputFile(fileName, SCStrategyLearner.LEARNING_REPORT_FOLDER);
+		
+		out.println("Stock Ticker:  " + m_ticker);
+		out.println("Date,Close,RSI");
+		
+		for (int count = m_closes.length - 1; count >=0; count--)
+			out.println(StockCentral.translateCalendarToString(m_dates[count]) + "," + m_closes[count] + "," + m_14DayRSI[count]);
+		
+		out.close();
+		
+	}
 
 	/*
 	 * public void createStockChart() {

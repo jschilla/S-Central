@@ -13,7 +13,7 @@ import java.net.URL;
 
 /**
  * @author Jack Schillaci
- * @version Build 2/16/2010
+ * @version Build 4/10/2014
  *
  */
 public class StockTickerLoader implements Serializable {
@@ -30,7 +30,7 @@ public class StockTickerLoader implements Serializable {
 		String fileName;
 
 			// First, we need to figure out if we're using the default tickers output file.
-		if ((args != null) && (args.length >0))
+		if ((args != null) && (args.length > 0))
 			fileName = args[0];
 		else
 			fileName = DEFAULT_FILENAME;
@@ -51,7 +51,8 @@ public class StockTickerLoader implements Serializable {
 		tickerArray.addAll(etfTickers);
 //		tickerArray.addAll(sp500Tickers);
 //		tickerArray.addAll(russ3000Tickers);
-
+//		tickerArray.add(DEBUG_TICKER);
+		
 			// Finally, we need to save this into a file.
 		StockCentral.serializeObject(fileName, null, tickerArray);
 
@@ -142,8 +143,8 @@ public class StockTickerLoader implements Serializable {
 
 				// now that we have the file open, we have to skip the first three lines (which are just garbage).
 			read.readLine();
-			read.readLine();
-			read.readLine();
+//			read.readLine();
+//			read.readLine();
 
 				// next, we parse out the tickers.  conveniently, the first item in each CSV file is
 				// the ticker, so we just pull that out.

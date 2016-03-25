@@ -116,6 +116,8 @@ public class Backtester {
 			catch (ArrayIndexOutOfBoundsException e) {
 
 				System.out.println(" -- Skipped for lack of data!");
+				
+				e.printStackTrace();
 
 			}
 

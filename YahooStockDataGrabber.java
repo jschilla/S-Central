@@ -25,10 +25,11 @@ public class YahooStockDataGrabber implements StockDataGrabber, StockCentralCons
 
     private static final String YAHOO_CURRENT_PRICE_URL =
     	"http://finance.yahoo.com/d/quotes.csv?f=sl1d1t1c1ohgv&e=.csv&s=";
-    private static final String STOCK_DATA_OPEN = "http://ichart.finance.yahoo.com/table.csv?g=w&";
+    private static final String STOCK_DATA_OPEN = "http://ichart.finance.yahoo.com/table.csv?";
     private static final int YEAR_OFFSET = 10;
     private static final int MONTH_OFFSET = 0;
     private static final int DATE_OFFSET = 0;
+    private static final char TIME_FRAME = 'd';
 
     private static final String[] MONTH_NAMES = {"Ja", "Fe", "Mar", "Ap", "May", "Jun", "Jul",
     	"Au", "Se", "Oc", "No", "De"};
@@ -422,7 +423,7 @@ public class YahooStockDataGrabber implements StockDataGrabber, StockCentralCons
         toReturn.append("s=" + ticker + "&a=" + (startDate.get(Calendar.MONTH)) + "&b=" +
         		startDate.get(Calendar.DAY_OF_MONTH) + "&c=" + (startDate.get(Calendar.YEAR)) +
         		"&d=" + (endDate.get(Calendar.MONTH) + 1) + "&e=" + endDate.get(Calendar.DAY_OF_MONTH) +
-        		"&f=" + (endDate.get(Calendar.YEAR)) + "&ignore=.csv");
+        		"&f=" + (endDate.get(Calendar.YEAR)) + "&g=" + TIME_FRAME + "&ignore=.csv");
 
         StockCentral.debugOutput("Stock Data URL created:  " + toReturn.toString());
 

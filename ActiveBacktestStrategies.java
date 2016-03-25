@@ -28,4 +28,6 @@ public class ActiveBacktestStrategies {
 
 	public static final BacktestStrategies[] getStrategies() { return ACTIVES; }
 
+	public static final MultiVariantStrategy[] getMultiVariantStrategies() { return null; }
+	
 }
