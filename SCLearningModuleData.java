@@ -6,7 +6,7 @@ public class SCLearningModuleData implements Serializable {
 	
 	private double m_optimalLevel;
 	private String m_ticker;
-	private double m_horizonReturn, m_frequency;
+	private double m_returnSuccess, m_returnAll, m_frequency;
 	private int m_horizon;
 	private SCLearningModule m_module;
 //	private double[] m_returnsBoC, m_returnsBoO;
@@ -25,10 +25,13 @@ public class SCLearningModuleData implements Serializable {
 	public String getTicker() { return m_ticker; }
 	public void setTicker(String ticker) { m_ticker = ticker; }
 	
-	public double getHorizonReturn() { return m_horizonReturn; }
-	public void setHorizonReturn(double horizonReturn) { m_horizonReturn = horizonReturn; }
+	public double getReturnSuccessfulDays() { return m_returnSuccess; }
+	public void setReturnSuccessfulDays(double horizonReturn) { m_returnSuccess = horizonReturn; }
 	
-	public int getHorizon() {return m_horizon; }
+	public double getReturnAllDays() { return m_returnAll; }
+	public void setReturnAllDays (double returnAll) { m_returnAll = returnAll; }
+	
+	public int getHorizon() { return m_horizon; }
 	public void setHorizon(int horizon) { m_horizon = horizon; }
 	
 	public double getFrequency() { return m_frequency; }

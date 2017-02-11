@@ -4,6 +4,7 @@
 package stockcentral;
 
 import java.util.ArrayList;
+import java.io.*;
 
 /**
  * @author Jack's Dell
@@ -16,6 +17,9 @@ import java.util.ArrayList;
  */
 public class Scanner {
 
+	private static final String FILE_PREFIX = "ScannerResults_";
+	private static final String FILE_DIRECTORY = "scanner";
+	
 	/**
 	 * @param args
 	 */
@@ -25,6 +29,11 @@ public class Scanner {
 			// First, we load up the appropriate StockDataArray object, which we then
 			// will use to load up individual StockData objects.
 		String fileName;
+		
+			// Open up a file to report results.
+		String outputFileName = FILE_PREFIX + System.currentTimeMillis() + ".csv";		
+		PrintWriter reportOut = StockCentral.createOutputFile(outputFileName, FILE_DIRECTORY);
+		reportOut.println("Ticker,Strategy,Date,Close,RSI");
 
 		if ((args != null) && (args.length > 0))
 			fileName = args[0];
@@ -55,7 +64,7 @@ public class Scanner {
 
 			data.calculateBellsAndWhistles();
 
-			data.spitOutData();
+			//data.spitOutData();
 
 				// This loop counts each strategy object
 			for (int countStrategyObjects = 0; countStrategyObjects < activeStrategies.length;
@@ -76,8 +85,12 @@ public class Scanner {
 						// of data.
 					if (gotASignal) {
 
-						System.out.println("Ticker: " + data.getTicker() + "; Strategy: " +
-								activeStrategies[countStrategyObjects].getStrategyName(countStrategyIds));
+						float rsi = data.get14DayRSI()[0];
+						
+						reportOut.println(data.getTicker() + "," + activeStrategies[countStrategyObjects].getStrategyName(countStrategyIds) +
+								"," + StockCentral.generateDateString(data.getDates()[0]) + "," + data.getCloses()[0] + "," + rsi);
+						
+						System.out.print("Match! ");
 
 					}
 
@@ -86,6 +99,8 @@ public class Scanner {
 			}
 
 		}
+		
+		reportOut.close();
 
 	}	// main()
 

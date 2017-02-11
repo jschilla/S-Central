@@ -12,13 +12,15 @@ import java.io.*;
 import java.net.URL;
 
 /**
+ * This loads all of the stock tickers from a local file.
+ * 
  * @author Jack Schillaci
  * @version Build 4/10/2014
  *
  */
 public class StockTickerLoader implements Serializable {
 
-	public static final String DEFAULT_FILENAME = "default_tickers.tkr";
+	public static final String OUTPUT_FILENAME = "default_tickers.tkr";
     public static final String DEBUG_TICKER = "MMM";
 
 	/**
@@ -33,12 +35,12 @@ public class StockTickerLoader implements Serializable {
 		if ((args != null) && (args.length > 0))
 			fileName = args[0];
 		else
-			fileName = DEFAULT_FILENAME;
+			fileName = DEFAULT_FILE_NAME;
 
 /*			// Next, let's get the the tickers from a method.
 		ArrayList<String> tickers = pullETFTickers();
 */
-		ArrayList<String> etfTickers = parseESDList(ETF_FILE_NAME);
+		ArrayList<String> etfTickers = parseESDList(fileName);
 //		ArrayList<String> sp500Tickers = parseESDList(SP500_FILE_NAME);
 //		ArrayList<String> russ3000Tickers = parseESDList(RUSSEL3000_FILE_NAME);
 
@@ -54,9 +56,22 @@ public class StockTickerLoader implements Serializable {
 //		tickerArray.add(DEBUG_TICKER);
 		
 			// Finally, we need to save this into a file.
-		StockCentral.serializeObject(fileName, null, tickerArray);
+		StockCentral.serializeObject(OUTPUT_FILENAME, null, tickerArray);
 
 	} // main
+
+	public static final void main(String inputFileName) {
+
+		String outputFileName = OUTPUT_FILENAME;
+		
+		ArrayList<String> tickers = parseESDList(inputFileName);
+
+		StockTickerArray tickerArray = new StockTickerArray();
+		tickerArray.addAll(tickers);
+		
+		StockCentral.serializeObject(OUTPUT_FILENAME, null, tickerArray);
+
+	}	// overloaded main
 
 	private static ArrayList<String> getTickers() {
 
@@ -69,7 +84,7 @@ public class StockTickerLoader implements Serializable {
 		return toReturn;
 
 	}	// getTickers
-
+	
 	private static final String ETF_TICKERS_URL =
 	    "http://www.masterdata.com/HelpFiles/ETF_List_Downloads/AllETFs.csv";
 
@@ -115,15 +130,17 @@ public class StockTickerLoader implements Serializable {
 		    }
         }	// try
         catch (IOException e) { e.printStackTrace(); }
+        
+        return null;
 
-        return toReturn;
 
 	}
 
-	private static final String DEFAULT_FILE_NAME = "etfs.csv";
-	private static final String ETF_FILE_NAME = "etfs_pruned.csv";
-	private static final String SP500_FILE_NAME = "sp500.csv";
-	private static final String RUSSEL3000_FILE_NAME = "rus3000.csv";
+	public static final String SP500_FILE_NAME = "sp500.csv";
+	public static final String ETF_FILE_NAME = "etfs.csv";
+	public static final String RUSSEL3000_FILE_NAME = "rus3000.csv";
+	public static final String DOW_FILE_NAME = "dow30.csv";
+	public static final String DEFAULT_FILE_NAME = SP500_FILE_NAME;
 
 	/**
 	*	This method parses a file listing ticker components of an index downloaded from easystockdata.com
@@ -158,7 +175,7 @@ public class StockTickerLoader implements Serializable {
 
 				toReturn.add(nextTicker);
 
-				System.out.println(nextTicker);
+				//System.out.println(nextTicker);
 
 			}	// while there are still lines left in this file.
 
@@ -172,6 +189,9 @@ public class StockTickerLoader implements Serializable {
 
 		}	// catch
 
+//		toReturn.clear();
+//		toReturn.add("MMM");
+		
 		return toReturn;
 	}
 

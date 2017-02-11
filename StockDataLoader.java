@@ -9,6 +9,8 @@ import java.io.*;
 import java.util.*;
 
 /**
+ * This class loads all of the data for the stocks the tickers of which we've loaded.
+ * 
  * @author Jack Schillaci
  * @version Build 2/16/2010
  *
@@ -40,7 +42,7 @@ public class StockDataLoader {
 		}	// if the user has passed file names.
 		else {
 
-			tickerFileName = stockcentral.StockTickerLoader.DEFAULT_FILENAME;
+			tickerFileName = stockcentral.StockTickerLoader.OUTPUT_FILENAME;
 			dataFileName = DEFAULT_DATA;
 
 		}	// if no file names have been passed.
@@ -70,8 +72,9 @@ public class StockDataLoader {
 
 				StockData sd = sdg.pullStockPriceHistoricalData(ticker);
 
-					// we only care about stocks that have a volume of at least 25000.
-				if (sd.getVolumes()[0] >= 10000) {
+					// we only care about stocks that have a volume of at least 10000, are trading above $5,
+					//	and for which we have at least 50 units of data.
+				if ((sd.getVolumes()[0] >= 10000) && (sd.getCloses()[0] >= 5) && (sd.getCloses().length >= 50)){
 
 					// sd.calculateBellsAndWhistles();
 
@@ -79,17 +82,17 @@ public class StockDataLoader {
 
 					StockCentral.serializeObject(sdFileName, DATA_DIRECTORY, sd);
 
-					dataArray.add(sdFileName);
-
 					numStocksInArray++;
 					
-					sd.calculateBellsAndWhistles();
+//					sd.calculateBellsAndWhistles();
 					
+					dataArray.add(sdFileName);
+
 //					sd.printOutRSI();
 
 				}	// if
 				else
-					System.out.println("Data for stock " + ticker + " skipped for insufficient volume");
+					System.out.println("Data for stock " + ticker + " skipped for low volume, low price or insufficient data.");
 
 			}	// try
 			catch (FileNotFoundException e) {
@@ -97,6 +100,11 @@ public class StockDataLoader {
 				System.out.println("Couldn't get the data for a stock.");
 
 			}	// catch
+			catch (ArrayIndexOutOfBoundsException e) {
+				
+				System.out.println("Stock data error - out of bounds!");
+				
+			}
 
 
 		}	// cycling through each ticker

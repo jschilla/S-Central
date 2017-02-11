@@ -10,7 +10,7 @@ import java.util.*;
  * @author jschilla
  *
  */
-public class SCRSI80Percent extends SCLearningModule {
+public class SCRSIShort extends SCLearningModule {
 
 	private final static int DEFAULT_INVESTMENT_HORIZON = 3;
 	private final static int DEFAULT_RSI_PERIODS = 14;
@@ -19,10 +19,10 @@ public class SCRSI80Percent extends SCLearningModule {
 	private int m_investmentHorizon, m_rsiPeriods;
 	private double m_confidenceLevel;
 	
-	private static final boolean DEBUG_OUTPUT = true;
+	//private static final boolean DEBUG_OUTPUT = false;
 	private static final String DEBUG_FOLDER = "debug";
 	
-	public SCRSI80Percent() {
+	public SCRSIShort() {
 		
 		m_investmentHorizon = DEFAULT_INVESTMENT_HORIZON;
 		m_confidenceLevel = DEFAULT_CONFIDENCE_LEVEL;
@@ -30,7 +30,7 @@ public class SCRSI80Percent extends SCLearningModule {
 		
 	}	// default ctor
 	
-	public SCRSI80Percent (int horizon, double confidence) {
+	public SCRSIShort (int horizon, double confidence) {
 		
 		m_investmentHorizon = horizon;
 		m_confidenceLevel = confidence;
@@ -38,7 +38,7 @@ public class SCRSI80Percent extends SCLearningModule {
 		
 	}
 	
-	public SCRSI80Percent (int horizon, double confidence, int rsiPeriods) {
+	public SCRSIShort (int horizon, double confidence, int rsiPeriods) {
 		
 		this (horizon, confidence);
 		m_rsiPeriods = rsiPeriods;
@@ -47,13 +47,13 @@ public class SCRSI80Percent extends SCLearningModule {
 	
 	public String getModuleMnemonic() {
 		
-		String toReturn = "RSIBull" + Integer.toString(m_investmentHorizon) + Integer.toString(m_rsiPeriods);
+		String toReturn = "RSIBear" + Integer.toString(m_investmentHorizon) + Integer.toString(m_rsiPeriods);
 		
 		return toReturn;
 		
 	}	// getModuleMnemonic
 	
-	public boolean isBullish() { return true; }
+	public boolean isBullish() { return false; }
 	
 		// What this learning module does is that it determines the RSI level at which 80% of the time there is
 		// a positive return after two trading days.  This is accomplished as follows:
@@ -62,7 +62,7 @@ public class SCRSI80Percent extends SCLearningModule {
 		// 		resulted in a positive return after two days.
 	public SCLearningModuleData learnOptimalTrade(StockData sd) {
 		 
-		SCRSIBullishModuleData toReturn = new SCRSIBullishModuleData();
+		SCRSIBearishModuleData toReturn = new SCRSIBearishModuleData();
 		toReturn.setModule(this);
 		
 			// First, run through each day's RSI and figure out the two-day return.
@@ -77,7 +77,7 @@ public class SCRSI80Percent extends SCLearningModule {
 		
 		if (DEBUG_OUTPUT) {
 			
-			String debugFileName = System.currentTimeMillis() + "_DebugLongFor_" + m_investmentHorizon + "_" + m_confidenceLevel + 
+			String debugFileName = System.currentTimeMillis() + "_DebugForShort_" + m_investmentHorizon + "_" + m_confidenceLevel + 
 					"_" + m_rsiPeriods + "_" + sd.getTicker() + ".csv";
 			debugOut = StockCentral.createOutputFile(debugFileName, DEBUG_FOLDER);
 			
@@ -85,7 +85,7 @@ public class SCRSI80Percent extends SCLearningModule {
 					",RSI, % Successful Matches (two days),Average Performance (on successful days)," +
 					"Average Performance (on all match days),Frequency of that RSI Level");
 			
-			String tradeListFileName = System.currentTimeMillis() + "_TradesForLong_" + m_investmentHorizon + "_" + m_confidenceLevel + 
+			String tradeListFileName = System.currentTimeMillis() + "_TradesForShort_" + m_investmentHorizon + "_" + m_confidenceLevel + 
 					"_" + m_rsiPeriods + "_" + sd.getTicker() + ".csv";
 			tradeListOut = StockCentral.createOutputFile(tradeListFileName, DEBUG_FOLDER);
 			
@@ -125,24 +125,24 @@ public class SCRSI80Percent extends SCLearningModule {
 				frequency = new Hashtable<Integer, Double>();
 		
 			// Outer loop:  go through each round whole RSI number
-		for (int countRSIs = 1; countRSIs < 100; countRSIs++) {
+		for (int countRSIs = 100; countRSIs > 0; countRSIs--) {
 			
 				// First inner loop:  isolate all RSIs below countRSIs.
-			Hashtable<Integer, Float> rsisBelowCount = new Hashtable<Integer, Float>();		// this should just be a stack.
+			Hashtable<Integer, Float> rsisAboveCount = new Hashtable<Integer, Float>();		// this should just be a stack.
 			
 			for (int countDays = m_investmentHorizon; countDays < rsis.length; countDays++) {
 				
 					// if this day's RSI is below the countRSI, then we put its index number in the hashtable.
-				if (rsis[countDays] < countRSIs)
-					rsisBelowCount.put(countDays, rsis[countDays]);
+				if (rsis[countDays] > countRSIs)
+					rsisAboveCount.put(countDays, rsis[countDays]);
 			}
 			
 				// Second inner loop:  calculate the average return across all of these RSIs.
-			int numberOfMatches = rsisBelowCount.size();
+			int numberOfMatches = rsisAboveCount.size();
 			int numberOfSuccessfulMatches = 0;
 			double percentageOfSuccessfulMatches = 0.0;
 			
-			Enumeration matchedIndexes = rsisBelowCount.keys();
+			Enumeration matchedIndexes = rsisAboveCount.keys();
 			double totalChangeOnSuccessfulDays = 0.0, totalChangeOnAllMatches = 0.0;
 
 			
@@ -152,7 +152,7 @@ public class SCRSI80Percent extends SCLearningModule {
 				
 				totalChangeOnAllMatches += twoDayDeltaPercentages[nextMatch];
 				
-				if (twoDayDeltas[nextMatch] > 0) {
+				if (twoDayDeltas[nextMatch] < 0) {
 					
 					numberOfSuccessfulMatches++;
 
@@ -164,20 +164,20 @@ public class SCRSI80Percent extends SCLearningModule {
 			if (numberOfMatches > 0)
 				percentageOfSuccessfulMatches = (double)numberOfSuccessfulMatches / (double)numberOfMatches;
 			
-			rsiAnalysis.put(countRSIs, percentageOfSuccessfulMatches);
-			averagePerformanceOnSuccessfulDays.put(countRSIs, (totalChangeOnSuccessfulDays / numberOfSuccessfulMatches));
-			averagePerformanceOnAllDays.put(countRSIs, (totalChangeOnAllMatches / numberOfMatches));
-			frequency.put(countRSIs, (double)(numberOfMatches / (double)rsis.length));
+			rsiAnalysis.put((countRSIs - 1), percentageOfSuccessfulMatches);
+			averagePerformanceOnSuccessfulDays.put((countRSIs - 1), (totalChangeOnSuccessfulDays / numberOfSuccessfulMatches));
+			averagePerformanceOnAllDays.put((countRSIs - 1), (totalChangeOnAllMatches / numberOfMatches));
+			frequency.put((countRSIs - 1), (double)(numberOfMatches / (double)rsis.length));
 			
 			
 		}
 		
-			// Second outer loop:  start at the top and figure out when's the first time we get a 
+			// Second outer loop:  start at the bottom and figure out when's the first time we get a 
 			// two-day return > 80%.
 		int optimalRSI = 0;
 		boolean keepScanning = true;
 		
-		for (int countRSIsBackwards = 99; (countRSIsBackwards > 0) && (keepScanning); countRSIsBackwards--) {
+		for (int countRSIsBackwards = 0; (countRSIsBackwards < 100) && (keepScanning); countRSIsBackwards++) {
 			
 			double twoDaySuccessRate = rsiAnalysis.get(countRSIsBackwards);
 			
@@ -197,7 +197,8 @@ public class SCRSI80Percent extends SCLearningModule {
 			
 /*				System.out.println("RSI:  " + countRSIsBackwards + ";  % Successful Matches:  " + twoDaySuccessRate +
 						";  Average Performance:  " + averagePerformance.get(countRSIsBackwards) + 
-						";  Frequency of RSI Level:  " + frequency.get(countRSIsBackwards));*/
+						";  Frequency of RSI Level:  " + frequency.get(countRSIsBackwards));
+*/
 			
 		}
 		
@@ -213,7 +214,7 @@ public class SCRSI80Percent extends SCLearningModule {
 		}
 		else {
 
-			toReturn.setOptimalLevel(0);
+			toReturn.setOptimalLevel(100);
 			toReturn.setHorizon(m_investmentHorizon);
 			toReturn.setReturnSuccessfulDays(0);
 			toReturn.setTicker(sd.getTicker());
@@ -226,9 +227,9 @@ public class SCRSI80Percent extends SCLearningModule {
 		
 		if (DEBUG_OUTPUT) {
 			
-//			debugOut.close();
+			debugOut.close();
 			
-//			tradeListOut.close();
+			tradeListOut.close();
 
 		}
 
@@ -240,7 +241,7 @@ public class SCRSI80Percent extends SCLearningModule {
 		
 		boolean toReturn = false;
 
-		SCRSIBullishModuleData data = (SCRSIBullishModuleData)optimalAnalysis;
+		SCRSIBearishModuleData data = (SCRSIBearishModuleData)optimalAnalysis;
 		
 		int rsiPeriods = data.getRSIPeriods();
 		double optimalLevel = data.getOptimalLevel();
@@ -248,7 +249,7 @@ public class SCRSI80Percent extends SCLearningModule {
 		
 		float[] rsis = StockCentral.calculateRSI(closes, rsiPeriods);
 		
-		if (rsis[lookback] < optimalLevel)
+		if (rsis[lookback] > optimalLevel)
 			toReturn = true;
 		
 		return toReturn;
@@ -258,13 +259,13 @@ public class SCRSI80Percent extends SCLearningModule {
 	public String getModuleName() { 
 		
 		return m_rsiPeriods + "-day RSI level at which there is a " + (m_confidenceLevel * 100) + 
-				"% chance of positive return after " + m_investmentHorizon + " trading days";
+				"% chance of negative return after " + m_investmentHorizon + " trading days";
 	
 	}
 	
 }
 
-class SCRSIBullishModuleData extends SCLearningModuleData {
+class SCRSIBearishModuleData extends SCLearningModuleData {
 	
 	private int m_rsiPeriods;
 	private double m_confidenceLevel;

@@ -11,7 +11,9 @@ public class ActiveBacktestStrategies {
 
 	private static final BacktestStrategies[] ACTIVES = {
 
-		new MacDStrategyTesterizer()
+		new LearnerStrategies()
+		
+//		new MacDStrategyTesterizer()
 
 //		new BigMoversStrategies(),
 

@@ -46,9 +46,10 @@ public class SCLearnedStrategyScanner {
 		dataArray.restartArray();
 		
 		for (int countSDs = 0; countSDs < dataArray.size(); countSDs++) {
-			
+						
 			StockData sd = dataArray.getNextData();
 			
+			System.out.println(sd.getTicker());
 			sds.put(sd.getTicker(), sd);
 			
 		}
@@ -80,7 +81,7 @@ public class SCLearnedStrategyScanner {
 			
 			StockData sd = sds.get(knowledge.getTicker());
 			
-			if (module.isOptimalTrade(sd, knowledge))
+			if (module.isOptimalTrade(sd, knowledge, 0))
 				reportOut.println(module.getModuleName() + "," + knowledge.getTicker());
 			
 		}

@@ -12,12 +12,16 @@ import java.io.*;
  */
 public abstract class SCLearningModule implements Serializable {
 
-	public final boolean DEBUG_OUTPUT = false;
+	public static final boolean DEBUG_OUTPUT = false;
 	
 	public abstract SCLearningModuleData learnOptimalTrade(StockData sd);
 	
-	public abstract boolean isOptimalTrade(StockData sd, SCLearningModuleData optimalAnalysis);
+	public abstract boolean isOptimalTrade(StockData sd, SCLearningModuleData optimalAnalysis, int lookback);
 	
 	public abstract String getModuleName();
+	
+	public abstract boolean isBullish();
+	
+	public abstract String getModuleMnemonic();
 	
 }
